@@ -1,0 +1,34 @@
+{
+  "feature_names": [
+    "driver_encoded",
+    "team_encoded",
+    "race_name_encoded",
+    "year",
+    "driver_competitiveness",
+    "team_competitiveness",
+    "points_last_3",
+    "session_air_temp",
+    "session_track_temp",
+    "session_humidity",
+    "session_rainfall",
+    "heat_index",
+    "weather_difficulty_index",
+    "circuit_type_encoded",
+    "driver_avg_points_in_rain",
+    "driver_avg_points_in_dry",
+    "driver_rain_dry_delta"
+  ],
+  "categorical_cols": [
+    "driver",
+    "team",
+    "race_name",
+    "circuit_type"
+  ],
+  "encoders": {
+    "driver": "app/models_cache/driver_encoder.pkl",
+    "team": "app/models_cache/team_encoder.pkl",
+    "race_name": "app/models_cache/race_name_encoder.pkl",
+    "circuit_type": "app/models_cache/circuit_type_encoder.pkl"
+  },
+  "best_model_name": "RandomForest"
+}

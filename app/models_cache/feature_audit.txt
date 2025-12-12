@@ -1,0 +1,22 @@
+Target: race_position
+
+UNSAFE (post-race sospechoso):
+
+SAFE (pre-race):
+- driver_encoded
+- team_encoded
+- race_name_encoded
+- year
+- driver_competitiveness
+- team_competitiveness
+- points_last_3
+- session_air_temp
+- session_track_temp
+- session_humidity
+- session_rainfall
+- heat_index
+- weather_difficulty_index
+- circuit_type_encoded
+- driver_avg_points_in_rain
+- driver_avg_points_in_dry
+- driver_rain_dry_delta

@@ -1,0 +1,10 @@
+fastf1
+scikit-learn
+xgboost-cpu
+pandas
+numpy
+matplotlib
+pyflakes
+fastapi
+uvicorn[standard]
+joblib

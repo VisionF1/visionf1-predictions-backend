@@ -1,0 +1,21 @@
+final_position,driver,team,driver_type,predicted_position,confidence
+1,NOR,McLaren,👤 Veterano,5.026918793069177,60.0
+2,PIA,McLaren,👤 Veterano,5.063126351277556,69.4
+3,LEC,Ferrari,👤 Veterano,7.796081314794735,60.0
+4,VER,Red Bull Racing,👤 Veterano,7.936650020619832,60.6
+5,RUS,Mercedes,👤 Veterano,8.05262204288331,69.5
+6,HAM,Ferrari,🔄 Cambio equipo,11.059919696313926,60.0
+7,ALO,Aston Martin,👤 Veterano,11.484375806024712,60.0
+8,STR,Aston Martin,👤 Veterano,12.359751675026,60.0
+9,BOR,Sauber,🆕 Rookie,12.394620149215665,66.1
+10,LAW,Racing Bulls,🆕 Rookie,12.43063897613312,75.7
+11,ALB,Williams,👤 Veterano,12.734067210260571,82.7
+12,GAS,Alpine,👤 Veterano,13.283522017696367,87.2
+13,ANT,Mercedes,🆕 Rookie,13.34234691395608,96.6
+14,HUL,Sauber,👤 Veterano,14.001996334932333,100.0
+15,COL,Alpine,🔄 Cambio equipo,15.05273656043879,99.5
+16,TSU,Red Bull Racing,🔄 Cambio equipo,15.152219167750971,91.5
+17,OCO,Haas,🔄 Cambio equipo,15.248956405041787,82.5
+18,HAD,Racing Bulls,🆕 Rookie,15.266607647752087,72.7
+19,BEA,Haas,🆕 Rookie,15.269174272540452,62.7
+20,SAI,Williams,🔄 Cambio equipo,15.382360909107428,60.0

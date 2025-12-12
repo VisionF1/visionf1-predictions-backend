@@ -1,0 +1,24 @@
+COMPARACIÓN DE MODELOS - MÉTRICAS DE ENTRENAMIENTO
+============================================================
+
+RandomForest:
+  CV MSE: 11.1128
+  Test MSE: 11.5307
+  Test R²: 0.6271
+  Overfitting Score: 1.12
+  Mejor Parámetros: {'bootstrap': True, 'max_depth': 3, 'max_features': 0.5, 'min_samples_leaf': 10, 'min_samples_split': 30, 'n_estimators': 50, 'oob_score': True}
+
+XGBoost:
+  CV MSE: 10.2295
+  Test MSE: 10.1292
+  Test R²: 0.6724
+  Overfitting Score: 1.26
+  Mejor Parámetros: {'colsample_bytree': 0.8, 'learning_rate': 0.03, 'max_depth': 3, 'min_child_weight': 20, 'n_estimators': 200, 'reg_alpha': 2.0, 'reg_lambda': 2.0, 'subsample': 0.8}
+
+GradientBoosting:
+  CV MSE: 10.6277
+  Test MSE: 10.8366
+  Test R²: 0.6496
+  Overfitting Score: 1.27
+  Mejor Parámetros: {'learning_rate': 0.1, 'max_depth': 3, 'max_features': 0.5, 'min_samples_leaf': 14, 'min_samples_split': 20, 'n_estimators': 50, 'subsample': 0.6, 'validation_fraction': 0.1}
+
