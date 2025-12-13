@@ -260,3 +260,8 @@ VALID_WEATHER_SCENARIOS = [
     "storm",
     "cold",
 ]
+
+TEAM_DISPLAY_MAPPING = {
+    "Sauber": "Kick Sauber",
+    "Haas": "Haas F1 Team",
+}

@@ -14,9 +14,7 @@ import re
 
 from app.core.pipeline import Pipeline
 from app.config import RACE_RANGE, PREDICTION_CONFIG, SCENARIO_EMOJIS
-# We use config from app, assuming it has what we need or we reuse visionf1/config?
-# Actually, controller uses visionf1/config. service uses app/config to pass to pipeline.
-# Pipeline expects RACE_RANGE from app.config.
+from visionf1.config import TEAM_DISPLAY_MAPPING
 
 # Cache Constants
 BASE_CACHE_DIR = "app/models_cache/api_cache"
@@ -94,7 +92,7 @@ class PredictionService:
             for _, r in df.iterrows():
                 results.append({
                     "driver": r["driver"],
-                    "team": r["team"],
+                    "team": TEAM_DISPLAY_MAPPING.get(r["team"], r["team"]),
                     "race_name": r.get("race_name"),
                     "pred_rank": int(r["pred_rank"]),
                     "pred_best_quali_lap": r["pred_best_quali_lap"],
@@ -114,7 +112,7 @@ class PredictionService:
             for _, r in df.iterrows():
                 rows.append({
                     "driver": r["driver"],
-                    "team": r["team"],
+                    "team": TEAM_DISPLAY_MAPPING.get(r["team"], r["team"]),
                     "final_position": int(r["final_position"]),
                 })
             return rows
