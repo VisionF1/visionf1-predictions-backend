@@ -74,6 +74,6 @@ class PredictAllResponse(BasePredictionResponse):
     """
     Response for both qualification and race prediction.
     """
-    quali_top10: List[QualiPredictionItem]
+    quali_full: List[QualiPredictionItem]
     race_predictions_full: List[RacePredictionItem]
     errors: Optional[Dict[str, str]] = None

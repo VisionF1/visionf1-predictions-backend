@@ -268,7 +268,7 @@ class PredictionService:
             self.pipeline.predict_all() # This creates artifacts
 
             race_full = []
-            quali_top10 = []
+            quali_full = []
             errors = {}
 
             try:
@@ -284,15 +284,15 @@ class PredictionService:
                 errors["race_full"] = str(e)
             
             try:
-                quali_top10 = self._build_quali_top(top=10)
+                quali_full = self._build_quali_top(top=20)
             except Exception as e:
-                errors["quali_top10"] = str(e)
+                errors["quali_full"] = str(e)
             
             response_core = {
                 "status": "ok" if not errors else "partial_ok",
                 "detail": "Quali + Race predictions executed",
                 "next_race": info,
-                "quali_top10": quali_top10,
+                "quali_full": quali_full,
                 "race_predictions_full": race_full,
                 "errors": errors or None
             }
