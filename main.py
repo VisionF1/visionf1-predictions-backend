@@ -27,7 +27,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="VisionF1 Predictions API",
     description="API for training models and generating F1 predictions",
-    version="1.0.1",
+    version="1.0.0",
     lifespan=lifespan
 )
 
