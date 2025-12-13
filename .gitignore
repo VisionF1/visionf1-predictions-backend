@@ -14,3 +14,4 @@ app/core/utils/__pycache__
 app/core/predictors/models/__pycache__
 app/core/predictors/simple_position_predictor/__pycache__
 __pycache__/
+.env
