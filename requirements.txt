@@ -5,6 +5,6 @@ pandas
 numpy
 matplotlib
 pyflakes
-fastapi
+fastapi[standard]
 uvicorn[standard]
 joblib
