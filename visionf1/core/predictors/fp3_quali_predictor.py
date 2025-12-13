@@ -120,14 +120,14 @@ class Fp3QualiPredictor:
             winsor_limits=winsor_limits,
         )
 
-    def save(self, path: str = "models_cache/fp3_quali_model.pkl") -> None:
+    def save(self, path: str = "visionf1/models_cache/fp3_quali_model.pkl") -> None:
         if self.model is None:
             raise RuntimeError("Modelo no entrenado")
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "wb") as f:
             pickle.dump(self.model, f)
 
-    def load(self, path: str = "models_cache/fp3_quali_model.pkl") -> bool:
+    def load(self, path: str = "visionf1/models_cache/fp3_quali_model.pkl") -> bool:
         if not os.path.exists(path):
             return False
         with open(path, "rb") as f:

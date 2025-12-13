@@ -25,10 +25,10 @@
     "circuit_type"
   ],
   "encoders": {
-    "driver": "app/models_cache/driver_encoder.pkl",
-    "team": "app/models_cache/team_encoder.pkl",
-    "race_name": "app/models_cache/race_name_encoder.pkl",
-    "circuit_type": "app/models_cache/circuit_type_encoder.pkl"
+    "driver": "visionf1/models_cache/driver_encoder.pkl",
+    "team": "visionf1/models_cache/team_encoder.pkl",
+    "race_name": "visionf1/models_cache/race_name_encoder.pkl",
+    "circuit_type": "visionf1/models_cache/circuit_type_encoder.pkl"
   },
   "best_model_name": "RandomForest"
 }

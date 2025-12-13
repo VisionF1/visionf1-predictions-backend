@@ -21,7 +21,7 @@ class PredictionService:
         self.cache_lock = Lock()
         
         # Cache directories directory relative to where the app is run (root)
-        self.base_cache_dir = "models_cache/api_cache"
+        self.base_cache_dir = "visionf1/models_cache/api_cache"
         self.race_cache_dir = os.path.join(self.base_cache_dir, "predict_race")
         self.quali_cache_dir = os.path.join(self.base_cache_dir, "predict_quali")
         self.all_cache_dir = os.path.join(self.base_cache_dir, "predict_all")
@@ -47,7 +47,7 @@ class PredictionService:
 
     def _build_quali_top(self, top=10) -> List[Dict[str, Any]]:
         """Reads CSV predictions and returns top N as JSON."""
-        qp = "models_cache/quali_predictions_latest.csv"
+        qp = "visionf1/models_cache/quali_predictions_latest.csv"
         try:
             df = pd.read_csv(qp)
             df = df.sort_values("pred_rank").head(top)
@@ -67,7 +67,7 @@ class PredictionService:
 
     def _build_race_full(self) -> List[Dict[str, Any]]:
         """Reads CSV race predictions and returns all."""
-        rp = "models_cache/race_predictions_latest.csv"
+        rp = "visionf1/models_cache/race_predictions_latest.csv"
         try:
             df = pd.read_csv(rp)
             df = df.sort_values("final_position")

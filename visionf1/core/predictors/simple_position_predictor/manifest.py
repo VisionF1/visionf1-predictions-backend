@@ -28,7 +28,7 @@ class ManifestHelper:
             if os.path.exists(p):
                 path = p
                 break
-        return os.path.dirname(path) if path else "models_cache"
+        return os.path.dirname(path) if path else "visionf1/models_cache"
 
     def feature_names_from_manifest(self) -> list:
         if not self.manifest:

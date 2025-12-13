@@ -46,7 +46,7 @@ def audit_features(feature_names, target_name=None, prefix="Entrenamiento"):
     for name, _ in safe:
         print(f"      - {name}")
     try:
-        out_path = "models_cache/feature_audit.txt"
+        out_path = "visionf1/models_cache/feature_audit.txt"
         rows = [f"Target: {target_name}\n\n", "UNSAFE (post-race sospechoso):\n"]
         rows += [f"- {n} [{r}]\n" for n, r in unsafe]
         rows += ["\nSAFE (pre-race):\n"]

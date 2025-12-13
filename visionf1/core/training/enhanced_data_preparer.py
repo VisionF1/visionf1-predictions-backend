@@ -26,14 +26,14 @@ class EnhancedDataPreparer:
             print(msg)
 
     def _load_encoder(self, col: str) -> Optional[LabelEncoder]:
-        p = Path(f"models_cache/{col}_encoder.pkl")
+        p = Path(f"visionf1/models_cache/{col}_encoder.pkl")
         if not p.exists():
             return None
         with open(p, "rb") as f:
             return pickle.load(f)
 
     def _save_encoder(self, col: str, le: LabelEncoder):
-        p = Path(f"models_cache/{col}_encoder.pkl")
+        p = Path(f"visionf1/models_cache/{col}_encoder.pkl")
         p.parent.mkdir(parents=True, exist_ok=True)
         with open(p, "wb") as f:
             pickle.dump(le, f)
@@ -286,7 +286,7 @@ class EnhancedDataPreparer:
         out = out.merge(ev, on="weekend_key", how="left")
 
         # 7) Guardar CSV
-        cache_dir = Path("models_cache")
+        cache_dir = Path("visionf1/models_cache")
         cache_dir.mkdir(parents=True, exist_ok=True)
         csv_path = cache_dir / "quali_dataset_latest.csv"
         out_cols = [

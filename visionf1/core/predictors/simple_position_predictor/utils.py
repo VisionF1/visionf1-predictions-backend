@@ -42,8 +42,8 @@ class Explainer:
         return pd.Series(changes, index=cols)
 
     def explain_feature_importance(self, top_k: int = 25,
-                                   csv_path: str = "models_cache/feature_importances.csv",
-                                   png_path: str = "models_cache/feature_importances.png",
+                                   csv_path: str = "visionf1/models_cache/feature_importances.csv",
+                                   png_path: str = "visionf1/models_cache/feature_importances.png",
                                    n_repeats: int = 10) -> pd.DataFrame:
         import matplotlib.pyplot as plt
         base_df = self.fh.build_base_df()

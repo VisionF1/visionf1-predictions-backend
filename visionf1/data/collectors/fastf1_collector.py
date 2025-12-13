@@ -9,7 +9,7 @@ class FastF1Collector:
     def __init__(self, race_range, force_refresh: bool = False, fastf1_cache_dir: str | None = None):
         self.race_range = race_range
         self.data = []
-        self.cache_dir = "models_cache/raw_data"
+        self.cache_dir = "visionf1/models_cache/raw_data"
         self.force_refresh = bool(force_refresh)
         # habilitar cache persistente de fastf1 si se indica
         if fastf1_cache_dir:

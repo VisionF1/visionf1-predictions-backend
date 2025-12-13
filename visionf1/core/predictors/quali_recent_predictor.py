@@ -127,14 +127,14 @@ class RecentQualiPredictor:
         # attach bonus map lazily
         self._sprint_bonus = sprint_bonus
 
-    def save(self, path: str = "models_cache/quali_recent_model.pkl") -> None:
+    def save(self, path: str = "visionf1/models_cache/quali_recent_model.pkl") -> None:
         if self.model is None:
             raise RuntimeError("Modelo no entrenado")
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "wb") as f:
             pickle.dump(self.model, f)
 
-    def load(self, path: str = "models_cache/quali_recent_model.pkl") -> bool:
+    def load(self, path: str = "visionf1/models_cache/quali_recent_model.pkl") -> bool:
         if not os.path.exists(path):
             return False
         try:

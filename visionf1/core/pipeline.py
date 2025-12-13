@@ -114,7 +114,7 @@ class Pipeline:
         predictor.show_realistic_predictions(predictions_df)
 
         # Guardar predicciones
-        output_file = "models_cache/realistic_predictions_2025.csv"
+        output_file = "visionf1/models_cache/realistic_predictions_2025.csv"
         predictions_df.to_csv(output_file, index=False)
         print(f"💾 Predicciones guardadas: {output_file}")
 
@@ -137,7 +137,7 @@ class Pipeline:
             print("🧠 Entrenando RecentQualiPredictor (sin FP3)...")
             predictor = RecentQualiPredictor()
             predictor.fit(dataset, n_recent=3)
-            predictor.save("models_cache/quali_recent_model.pkl")
+            predictor.save("visionf1/models_cache/quali_recent_model.pkl")
             print("✅ Modelo de qualis recientes guardado en models_cache/quali_recent_model.pkl")
 
             # Backtest opcional y guardado
@@ -145,7 +145,7 @@ class Pipeline:
                 metrics = predictor.backtest(dataset)
                 if metrics and metrics.get("events", 0) > 0:
                     dfm = pd.DataFrame([metrics])
-                    dfm.to_csv("models_cache/quali_backtest_2025.csv", index=False)
+                    dfm.to_csv("visionf1/models_cache/quali_backtest_2025.csv", index=False)
                     print("📊 Backtest guardado: models_cache/quali_backtest_2025.csv")
                     print(f"   MAE={metrics.get('mae_s', float('nan')):.3f}s  MedAE={metrics.get('medae_s', float('nan')):.3f}s  Eventos={metrics.get('events', 0)}")
             except Exception as e:
@@ -161,10 +161,10 @@ class Pipeline:
         Genera models_cache/quali_predictions_latest.csv"""
         # Cargar modelo
         predictor = RecentQualiPredictor()
-        if not predictor.load("models_cache/quali_recent_model.pkl"):
+        if not predictor.load("visionf1/models_cache/quali_recent_model.pkl"):
             print("ℹ️ No existe modelo de qualis recientes. Entrenando ahora...")
             ok = self.train_quali_from_fp3(year=2025)
-            if not ok or not predictor.load("models_cache/quali_recent_model.pkl"):
+            if not ok or not predictor.load("visionf1/models_cache/quali_recent_model.pkl"):
                 print("❌ No se pudo cargar/entrenar el modelo de qualis recientes")
                 return pd.DataFrame()
 
@@ -201,7 +201,7 @@ class Pipeline:
         preds = predictor.predict_next_event(meta, event_df=event_df if not event_df.empty else None)
 
         # Guardar CSV
-        out_path = "models_cache/quali_predictions_latest.csv"
+        out_path = "visionf1/models_cache/quali_predictions_latest.csv"
         preds.to_csv(out_path, index=False)
         print(f"💾 Predicciones de quali guardadas: {out_path}")
 
@@ -218,7 +218,7 @@ class Pipeline:
 
     def _load_cached_data(self):
         """Carga datos desde cache"""
-        cache_file = "models_cache/cached_data.pkl"
+        cache_file = "visionf1/models_cache/cached_data.pkl"
         if os.path.exists(cache_file):
             with open(cache_file, 'rb') as f:
                 self.data = pickle.load(f)
@@ -228,7 +228,7 @@ class Pipeline:
 
     def _save_cached_data(self):
         """Guarda datos en cache"""
-        cache_dir = "models_cache"
+        cache_dir = "visionf1/models_cache"
         if not os.path.exists(cache_dir):
             os.makedirs(cache_dir, exist_ok=True)
         
@@ -244,7 +244,7 @@ class Pipeline:
             return
         
         # Crear directorio si no existe
-        cache_dir = "models_cache"
+        cache_dir = "visionf1/models_cache"
         if not os.path.exists(cache_dir):
             os.makedirs(cache_dir, exist_ok=True)
         
@@ -290,7 +290,7 @@ class Pipeline:
         """Guarda el dataset después del feature engineering y limpieza"""
         try:
             # Crear directorio si no existe
-            cache_dir = "models_cache"
+            cache_dir = "visionf1/models_cache"
             if not os.path.exists(cache_dir):
                 os.makedirs(cache_dir, exist_ok=True)
             
@@ -347,7 +347,7 @@ class Pipeline:
         Descarga fresca (ignorando PKL locales) para una lista de eventos [{year, race_name, round_number?}].
         Devuelve DataFrame combinado de esos eventos.
         """
-        cache_dir = "models_cache/fastf1"
+        cache_dir = "visionf1/models_cache/fastf1"
         collector = FastF1Collector(events, force_refresh=True, fastf1_cache_dir=(cache_dir if use_persistent_fastf1_cache else None))
         collector.collect_data(force_refresh=True)
         df = collector.get_data()
@@ -391,7 +391,7 @@ class Pipeline:
         if grid_df is None or grid_df.empty:
             # usar quali predicha
             try:
-                quali_path = "models_cache/quali_predictions_latest.csv"
+                quali_path = "visionf1/models_cache/quali_predictions_latest.csv"
                 q = pd.read_csv(quali_path)
                 if not q.empty:
                     grid_df = q[["driver", "pred_rank"]].rename(columns={"pred_rank": "grid_position"})
@@ -429,7 +429,7 @@ class Pipeline:
         out.rename(columns={"base_score": "model_position_score", "race_score": "predicted_position"}, inplace=True)
 
         # Guardar
-        out_path = "models_cache/race_predictions_latest.csv"
+        out_path = "visionf1/models_cache/race_predictions_latest.csv"
         out.to_csv(out_path, index=False)
         print(f"💾 Predicción de carrera guardada: {out_path}")
         return out
@@ -443,35 +443,35 @@ class Pipeline:
         ok_q = self.train_quali_from_fp3(year=2025)
         if not ok_q:
             print("⚠️ Entrenamiento de quali fallido o incompleto")
-        artifacts["quali_model"] = "models_cache/quali_recent_model.pkl"
+        artifacts["quali_model"] = "visionf1/models_cache/quali_recent_model.pkl"
 
         # 2) Entrenar carrera (pipeline principal si hace falta)
         self.run()
-        artifacts["race_models"] = "models_cache/"  # carpeta
+        artifacts["race_models"] = "visionf1/models_cache/"  # carpeta
 
         # 3) Predecir quali de la próxima
         qpred = self.predict_quali_next_race()
-        artifacts["quali_predictions"] = "models_cache/quali_predictions_latest.csv"
+        artifacts["quali_predictions"] = "visionf1/models_cache/quali_predictions_latest.csv"
 
         # 4) Predecir carrera usando grilla (real si hay; si no, predicha)
         rpred = self.predict_race_from_quali_grid(beta=None)
-        artifacts["race_predictions"] = "models_cache/race_predictions_latest.csv"
+        artifacts["race_predictions"] = "visionf1/models_cache/race_predictions_latest.csv"
         return artifacts
 
     def predict_all(self) -> dict:
         """predice quali y luego predice carrera usando grilla.
         Devuelve rutas de archivos generados."""
         artifacts = {}
-        artifacts["quali_model"] = "models_cache/quali_recent_model.pkl"
+        artifacts["quali_model"] = "visionf1/models_cache/quali_recent_model.pkl"
 
-        artifacts["race_models"] = "models_cache/"  # carpeta
+        artifacts["race_models"] = "visionf1/models_cache/"  # carpeta
 
         # 3) Predecir quali de la próxima
         qpred = self.predict_quali_next_race()
-        artifacts["quali_predictions"] = "models_cache/quali_predictions_latest.csv"
+        artifacts["quali_predictions"] = "visionf1/models_cache/quali_predictions_latest.csv"
 
         # 4) Predecir carrera usando grilla (real si hay; si no, predicha)
         rpred = self.predict_race_from_quali_grid(beta=None)
-        artifacts["race_predictions"] = "models_cache/race_predictions_latest.csv"
+        artifacts["race_predictions"] = "visionf1/models_cache/race_predictions_latest.csv"
         return artifacts
 
