@@ -32,6 +32,7 @@ class QualiPredictionItem(BaseModel):
     race_name: Optional[str] = None
     pred_rank: int
     pred_best_quali_lap: Optional[str] = None
+    gap_to_pole: Optional[str] = None
 
 
 class RacePredictionItem(BaseModel):
@@ -41,6 +42,8 @@ class RacePredictionItem(BaseModel):
     driver: str
     team: str
     final_position: int
+    score: Optional[float] = None
+    confidence: Optional[float] = None
 
 
 class BasePredictionResponse(BaseModel):

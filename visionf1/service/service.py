@@ -87,20 +87,40 @@ class PredictionService:
         qp = "app/models_cache/quali_predictions_latest.csv"
         try:
             df = pd.read_csv(qp)
+
             df = df.sort_values("pred_rank").head(top)
+            
+            # Get Pole Position time for gap calculation
+            pole_time_s = df.iloc[0]["pred_best_quali_lap_s"] if not df.empty else 0
+            
             results = []
             for _, r in df.iterrows():
+                # Calculate gap
+                gap_s = r["pred_best_quali_lap_s"] - pole_time_s
+                gap_fmt = f"+{gap_s:.3f}" if gap_s > 0 else "-"
+                
                 results.append({
                     "driver": r["driver"],
                     "team": TEAM_DISPLAY_MAPPING.get(r["team"], r["team"]),
                     "race_name": r.get("race_name"),
                     "pred_rank": int(r["pred_rank"]),
                     "pred_best_quali_lap": r["pred_best_quali_lap"],
+                    "gap_to_pole": gap_fmt
                 })
             return results
         except Exception as e:
             logger.error(f"Error building quali top: {e}")
             return []
+
+    def _get_confidence_map(self) -> Dict[str, float]:
+        """Reads confidence from realistic predictions to inject into other views."""
+        rp = "app/models_cache/realistic_predictions_2025.csv"
+        try:
+            df = pd.read_csv(rp)
+            # Map driver -> confidence
+            return dict(zip(df["driver"], df["confidence"]))
+        except Exception:
+            return {}
 
     def _build_race_full(self, filename: str = "race_predictions_latest.csv") -> List[Dict[str, Any]]:
         """Reads CSV race predictions and returns all."""
@@ -110,11 +130,17 @@ class PredictionService:
             df = df.sort_values("final_position")
             rows = []
             for _, r in df.iterrows():
-                rows.append({
+                item = {
                     "driver": r["driver"],
                     "team": TEAM_DISPLAY_MAPPING.get(r["team"], r["team"]),
                     "final_position": int(r["final_position"]),
-                })
+                    "score": round(r["predicted_position"], 3) if "predicted_position" in r else 0.0
+                }
+                # Add confidence if available in this specific dataframe
+                if "confidence" in r:
+                    item["confidence"] = r["confidence"]
+                    
+                rows.append(item)
             return rows
         except Exception as e:
             logger.error(f"Error building race full: {e}")
@@ -247,6 +273,13 @@ class PredictionService:
 
             try:
                 race_full = self._build_race_full(filename="race_predictions_latest.csv")
+                
+                # Inject confidence from the realistic model run
+                conf_map = self._get_confidence_map()
+                for item in race_full:
+                    if item["driver"] in conf_map:
+                        item["confidence"] = conf_map[item["driver"]]
+                        
             except Exception as e:
                 errors["race_full"] = str(e)
             
