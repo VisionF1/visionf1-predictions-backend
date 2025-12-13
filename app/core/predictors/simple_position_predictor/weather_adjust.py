@@ -10,7 +10,7 @@ class WeatherAdjuster:
         stats = last_weather_stats
         if stats is None or scen not in ("wet", "dry"):
             return preds_df
-        alpha = 0.7  # sensibilidad (ajustable si quieres)
+        alpha = 0.5  # sensibilidad (ajustable si quieres)
         sign  = -1.0 if scen == "wet" else +1.0
         m = stats.set_index("driver")["driver_rain_dry_delta"]
         out = preds_df.copy()
