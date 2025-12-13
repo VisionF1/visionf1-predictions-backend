@@ -384,7 +384,17 @@ class Pipeline:
                 tmp = ev[["driver", "grid_position"]].dropna().copy()
                 if not tmp.empty:
                     tmp["grid_position"] = pd.to_numeric(tmp["grid_position"], errors="coerce")
-                    grid_df = tmp
+                    tmp["grid_position"] = pd.to_numeric(tmp["grid_position"], errors="coerce")
+                    
+                    # Validar que la grilla tenga sentido
+                    # 1. Std > 0 (varianza)
+                    # 2. No tener > 50% de la grilla en la misma posición (ej. todos 20 o 0)
+                    mode_count = tmp["grid_position"].value_counts().max()
+                    if tmp["grid_position"].std() > 0 and mode_count < (len(tmp) * 0.5):
+                        grid_df = tmp
+                    else:
+                        print(f"⚠️ Data real de grilla descartada (std={tmp['grid_position'].std():.2f}, duplicates={mode_count}): {tmp['grid_position'].unique()}")
+                        grid_df = None
         except Exception:
             grid_df = None
 

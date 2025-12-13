@@ -104,9 +104,9 @@ class PredictionService:
             logger.error(f"Error building quali top: {e}")
             return []
 
-    def _build_race_full(self) -> List[Dict[str, Any]]:
+    def _build_race_full(self, filename: str = "race_predictions_latest.csv") -> List[Dict[str, Any]]:
         """Reads CSV race predictions and returns all."""
-        rp = "app/models_cache/race_predictions_latest.csv"
+        rp = f"app/models_cache/{filename}"
         try:
             df = pd.read_csv(rp)
             df = df.sort_values("final_position")
@@ -150,7 +150,7 @@ class PredictionService:
             
             info = self.get_next_race_info(race_name, scenario)
             self.pipeline.predict_next_race_positions()
-            results = self._build_race_full()
+            results = self._build_race_full(filename="realistic_predictions_2025.csv")
 
             response = {
                 "status": "ok",
@@ -248,7 +248,7 @@ class PredictionService:
             errors = {}
 
             try:
-                race_full = self._build_race_full()
+                race_full = self._build_race_full(filename="race_predictions_latest.csv")
             except Exception as e:
                 errors["race_full"] = str(e)
             
