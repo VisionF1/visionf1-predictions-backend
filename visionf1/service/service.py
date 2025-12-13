@@ -2,40 +2,80 @@
 Prediction Service for VisionF1.
 Handles the orchestration of training and prediction pipelines.
 """
-import logging
 import os
+import json
+import logging
+from typing import Any, Dict, List, Optional
 from threading import Lock
-from typing import Dict, Any, List, Optional
 import pandas as pd
 
-from visionf1.core.pipeline import Pipeline
-from visionf1.config import RACE_RANGE, PREDICTION_CONFIG, SCENARIO_EMOJIS, VALID_RACE_NAMES, VALID_WEATHER_SCENARIOS, RACE_PREDICTION
-from visionf1.utils.cache import load_cache, save_cache
-from visionf1.models.models import NextRaceInfo
+import unicodedata
+import re
+
+from app.core.pipeline import Pipeline
+from app.config import RACE_RANGE, PREDICTION_CONFIG, SCENARIO_EMOJIS
+# We use config from app, assuming it has what we need or we reuse visionf1/config?
+# Actually, controller uses visionf1/config. service uses app/config to pass to pipeline.
+# Pipeline expects RACE_RANGE from app.config.
+
+# Cache Constants
+BASE_CACHE_DIR = "app/models_cache/api_cache"
+RACE_CACHE_DIR = os.path.join(BASE_CACHE_DIR, "predict_race")
+QUALI_CACHE_DIR = os.path.join(BASE_CACHE_DIR, "predict_quali")
+ALL_CACHE_DIR = os.path.join(BASE_CACHE_DIR, "predict_all")
 
 logger = logging.getLogger(__name__)
 
+# Ensure directories exist
+os.makedirs(RACE_CACHE_DIR, exist_ok=True)
+os.makedirs(QUALI_CACHE_DIR, exist_ok=True)
+os.makedirs(ALL_CACHE_DIR, exist_ok=True)
+
+
 class PredictionService:
     def __init__(self):
+        # Initialize pipeline once
         self.pipeline = Pipeline(RACE_RANGE)
         self.cache_lock = Lock()
-        
-        # Cache directories directory relative to where the app is run (root)
-        self.base_cache_dir = "visionf1/models_cache/api_cache"
-        self.race_cache_dir = os.path.join(self.base_cache_dir, "predict_race")
-        self.quali_cache_dir = os.path.join(self.base_cache_dir, "predict_quali")
-        self.all_cache_dir = os.path.join(self.base_cache_dir, "predict_all")
-        
-        os.makedirs(self.race_cache_dir, exist_ok=True)
-        os.makedirs(self.quali_cache_dir, exist_ok=True)
-        os.makedirs(self.all_cache_dir, exist_ok=True)
 
-    def get_next_race_info(self, race_name: Optional[str] = None, weather_scenario: Optional[str] = None) -> Dict[str, Any]:
+    def _slugify(self, text: str) -> str:
+        norm = unicodedata.normalize("NFKD", text)
+        norm = norm.encode("ascii", "ignore").decode("ascii")
+        norm = norm.lower()
+        norm = re.sub(r"[^a-z0-9]+", "_", norm)
+        norm = norm.strip("_")
+        return norm or "unknown"
+
+    def _cache_path(self, base_dir: str, race_name: str, scenario: str) -> str:
+        race_slug = self._slugify(race_name)
+        scen_slug = self._slugify(scenario)
+        filename = f"{race_slug}__{scen_slug}.json"
+        return os.path.join(base_dir, filename)
+
+    def _load_cache(self, base_dir: str, race_name: str, scenario: str) -> Optional[Dict[str, Any]]:
+        path = self._cache_path(base_dir, race_name, scenario)
+        if not os.path.exists(path):
+            return None
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return None
+
+    def _save_cache(self, base_dir: str, race_name: str, scenario: str, payload: Dict[str, Any]) -> None:
+        path = self._cache_path(base_dir, race_name, scenario)
+        try:
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(payload, f, ensure_ascii=False)
+        except Exception:
+            pass
+
+    def get_next_race_info(self, race_name: str | None = None, weather_scenario: str | None = None) -> Dict[str, Any]:
         cfg = PREDICTION_CONFIG
-        race_cfg = cfg["next_race"]
+        race_cfg = cfg.get("next_race", {})
 
-        final_race_name = race_name or race_cfg["race_name"]
-        final_scenario = weather_scenario or cfg["active_scenario"]
+        final_race_name = race_name or race_cfg.get("race_name")
+        final_scenario = weather_scenario or cfg.get("active_scenario")
         final_emoji = SCENARIO_EMOJIS.get(final_scenario, '')
         
         return {
@@ -46,8 +86,7 @@ class PredictionService:
         }
 
     def _build_quali_top(self, top=10) -> List[Dict[str, Any]]:
-        """Reads CSV predictions and returns top N as JSON."""
-        qp = "visionf1/models_cache/quali_predictions_latest.csv"
+        qp = "app/models_cache/quali_predictions_latest.csv"
         try:
             df = pd.read_csv(qp)
             df = df.sort_values("pred_rank").head(top)
@@ -67,7 +106,7 @@ class PredictionService:
 
     def _build_race_full(self) -> List[Dict[str, Any]]:
         """Reads CSV race predictions and returns all."""
-        rp = "visionf1/models_cache/race_predictions_latest.csv"
+        rp = "app/models_cache/race_predictions_latest.csv"
         try:
             df = pd.read_csv(rp)
             df = df.sort_values("final_position")
@@ -94,8 +133,8 @@ class PredictionService:
         key_race = (race_name, scenario)
 
         with self.cache_lock:
-            cached = load_cache(self.race_cache_dir, *key_race)
-
+            cached = self._load_cache(RACE_CACHE_DIR, *key_race)
+        
         if cached is not None:
             logger.info(f"Using disk cache for {key_race}")
             return {**cached, "cached": True}
@@ -122,7 +161,7 @@ class PredictionService:
             }
 
             with self.cache_lock:
-                save_cache(self.race_cache_dir, *key_race, {k: v for k, v in response.items() if k != "cached"})
+                self._save_cache(RACE_CACHE_DIR, *key_race, {k: v for k, v in response.items() if k != "cached"})
             
             return response
         finally:
@@ -141,8 +180,8 @@ class PredictionService:
         key_quali = (race_name, scenario)
 
         with self.cache_lock:
-            cached = load_cache(self.quali_cache_dir, *key_quali)
-
+            cached = self._load_cache(QUALI_CACHE_DIR, *key_quali)
+            
         if cached is not None:
              logger.info(f"Using disk cache for {key_quali}")
              return {**cached, "cached": True}
@@ -168,7 +207,7 @@ class PredictionService:
             }
 
             with self.cache_lock:
-                save_cache(self.quali_cache_dir, *key_quali, {k: v for k, v in response.items() if k != "cached"})
+                self._save_cache(QUALI_CACHE_DIR, *key_quali, {k: v for k, v in response.items() if k != "cached"})
             
             return response
         finally:
@@ -187,7 +226,7 @@ class PredictionService:
          key_all = (race_name, scenario)
 
          with self.cache_lock:
-             cached = load_cache(self.all_cache_dir, *key_all)
+             cached = self._load_cache(ALL_CACHE_DIR, *key_all)
         
          if cached is not None:
              logger.info(f"Using disk cache for {key_all}")
@@ -230,7 +269,7 @@ class PredictionService:
             response = {**response_core, "cached": False}
 
             with self.cache_lock:
-                save_cache(self.all_cache_dir, *key_all, response_core)
+                self._save_cache(ALL_CACHE_DIR, *key_all, response_core)
             
             return response
          finally:
