@@ -139,10 +139,4 @@ The system implements a **Progressive Adaptation Algorithm**:
 
 ---
 
-## Contributing
-
-Contributions are welcome! Please verify that any changes to the pipeline are tested against the `predict-all` endpoint to ensure data integrity across both session types.
-
----
-
 © 2025 VisionF1 Team
